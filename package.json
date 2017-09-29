@@ -1,0 +1,19 @@
+{
+  "name": "fbmasterclass2",
+  "version": "1.0.0",
+  "description": "ChatBot with Facebook Messenger",
+  "main": "index.js",
+  "scripts": {
+    "serve": "node index.js"
+  },
+  "keywords": [
+    "chat",
+    "bot"
+  ],
+  "author": "Ramadani",
+  "license": "ISC",
+  "dependencies": {
+    "body-parser": "^1.18.2",
+    "express": "^4.16.0"
+  }
+}
