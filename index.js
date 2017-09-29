@@ -2,6 +2,7 @@ require('dotenv').config();
 
 const express = require('express');
 const bodyParser = require('body-parser');
+const request = require('request');
 
 const app = express();
 
@@ -24,10 +25,42 @@ app.get('/', (req, res) => {
   res.sendStatus(200);
 });
 
-app.get('/webhook', (req, res) => {
-  if (req.query['hub.mode'] && req.query['hub.verify_token'] === VALID_TOKEN) {
-      res.status(200).send(req.query['hub.challenge']);
-  } else {
-      res.status(403).end();
+app.post('/webhook', (req, res) => {
+  if (req.body.object === 'page') {
+    req.body.entry.forEach((entry) => {
+      if (entry.messaging) {
+        entry.messaging.forEach((event) => {
+          if (event.message && event.message.text) {
+            sendMessage(event);
+            console.log(event);
+          }
+        });
+      }
+    });
+    res.status(200).end();
   }
 });
+
+function sendMessage(event) {
+  let sender = event.sender.id;
+  let text = event.message.text;
+
+  /* Test Data */
+  console.log("Dikirim ke %s ", sender);
+
+  request({
+    url: 'https://graph.facebook.com/v2.10/me/messages',
+    qs: {access_token: ACCESS_TOKEN},
+    method: 'POST',
+    json: {
+      recipient: {id: sender},
+      message: {text: text}
+    }
+  }, function (error, response) {
+    if (error) {
+        console.log('Error sending message: ', error);
+    } else if (response.body.error) {
+        console.log('Error: ', response.body.error);
+    }
+  });
+}
